@@ -3,9 +3,10 @@ import Axios from 'axios';
 const APIKEY = '28a885c6daab4d7bb1791bcb85db6ad5'
 const SEARCH = 'coronavirus'
 const LANGUAGE = 'es'
-const FROM = '2020-03-29'
-const ENDPOINT = `http://newsapi.org/v2/everything?q=${SEARCH}&apiKey=${APIKEY}&language=${LANGUAGE}&from=${FROM}`
+const SORTBY = 'publishedAt'
 
-const get = () => Axios.get(ENDPOINT);
+const endpoint = (page) => `http://newsapi.org/v2/top-headlines?q=${SEARCH}&apiKey=${APIKEY}&language=${LANGUAGE}&sortBy=${SORTBY}&page=${page}`
+
+const get = ({ page }) => Axios.get(endpoint(page), { timeout: 5000 });
 
 export default { get }

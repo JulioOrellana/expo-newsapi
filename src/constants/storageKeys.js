@@ -1,0 +1,1 @@
+export const SAVED_NEWS = 'SAVED_NEWS'

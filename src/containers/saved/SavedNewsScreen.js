@@ -1,10 +1,9 @@
 import React, { useContext } from 'react'
-import { RefreshControl, StyleSheet, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { FlatList } from 'react-native-gesture-handler'
 import { useSafeArea } from 'react-native-safe-area-context'
 import { Card } from '../../components/Card'
 import Header from '../../components/Header'
-import { Loading } from '../../components/Loading'
 import NoNews from '../../components/NoNews'
 import Colors from '../../constants/Colors'
 import { NewsContext } from '../../context/NewsHandler'
@@ -23,28 +22,22 @@ const styles = StyleSheet.create({
   },
 })
 
-export default HomeScreen = () => {
-  const insets = useSafeArea();
-  const { news, isFetching, handleCurrentNews, fetchNews, savedNews } = useContext(NewsContext)
-
+export default SavedNewsScreen = () => {
+  const insets = useSafeArea()
+  const { savedNews, isFetching, handleCurrentNews, news } = useContext(NewsContext)
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Header headerText={Dictionary.main.headerTitle} />
+      <Header headerText={Dictionary.favorite.headerTitle} />
       <FlatList
-        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={fetchNews} />}
         contentContainerStyle={styles.extraPaddingFlatList}
-        ListEmptyComponent={() =>
-          isFetching
-            ? <Loading showLoading={false} showLoadingText loadingText={Dictionary.main.loading} />
-            : <NoNews />
-        }
-        data={news}
+        ListEmptyComponent={() => <NoNews />}
+        data={savedNews}
         keyExtractor={(item, index) => `${index}-${item.publishedAt}`}
         renderItem={({ item }) => (
           <Card
             news={item}
             handleCurrentNews={handleCurrentNews}
-            savedNews={savedNews}
+            deleteNews
           />
         )}
         ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
@@ -52,4 +45,5 @@ export default HomeScreen = () => {
     </View>
   )
 }
+
 

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-news",
-    "slug": "expo-news",
+    "name": "beetrack-expo-news",
+    "slug": "beetrack-expo-news",
     "platforms": [
       "ios",
       "android",
@@ -23,6 +23,8 @@
     ],
     "ios": {
       "supportsTablet": true
-    }
+    },
+    "description": "",
+    "githubUrl": "https://github.com/JulioOrellana/expo-newsapi"
   }
 }

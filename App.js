@@ -6,6 +6,7 @@ import * as Font from 'expo-font';
 import * as React from 'react';
 import { Platform, StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import NewsHandler from './src/context/NewsHandler';
 import BottomTabNavigator from './src/navigation/BottomTabNavigator';
 
 const Stack = createStackNavigator();
@@ -43,16 +44,18 @@ export default function App(props) {
   } else {
     return (
       <SafeAreaProvider>
-        {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
-        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false
-            }}
-          >
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <NewsHandler>
+          {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
+          <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false
+              }}
+            >
+              <Stack.Screen name="Root" component={BottomTabNavigator} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </NewsHandler>
       </SafeAreaProvider>
     );
   }

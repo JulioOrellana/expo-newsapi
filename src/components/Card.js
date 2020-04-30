@@ -1,10 +1,12 @@
-import { format } from 'date-fns';
-import * as WebBrowser from 'expo-web-browser';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
-import Colors from '../constants/Colors';
-import { Dictionary } from '../lib/dictionary';
-import { CustomIcon } from './TabBarIcon';
+import { format } from 'date-fns'
+import * as WebBrowser from 'expo-web-browser'
+import PropTypes from 'prop-types'
+import React from 'react'
+import { Image, StyleSheet, Text, TouchableHighlight, View } from 'react-native'
+import Colors from '../constants/Colors'
+import { Dictionary } from '../lib/dictionary'
+import { isNewsSaved, isValidUrl } from '../lib/utils'
+import { CustomIcon } from './CustomIcon'
 
 const styles = StyleSheet.create({
   container: {
@@ -32,6 +34,7 @@ const styles = StyleSheet.create({
   authorContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingTop: 5,
   },
   authortext: {
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   newsButtonText: {
-    color: Colors.textBlack,
+    color: Colors.white,
     textDecorationLine: 'underline',
   },
   favoriteButtonContainer: {
@@ -78,22 +81,40 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   favoriteText: {
+    paddingRight: 5,
     fontSize: 10,
+  },
+  publishedText: {
+    fontSize: 10
+  },
+  openWebview: {
+    backgroundColor: Colors.blue,
+    padding: 5,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  bookmark: {
+    padding: 5,
   },
 })
 
 const handleLearnMorePress = (url) => WebBrowser.openBrowserAsync(url);
 
 export const Card = ({
-  source,
-  author,
-  title,
-  description,
-  url,
-  urlToImage,
-  publishedAt,
-  content,
-}) => (
+  news,
+  handleCurrentNews,
+  deleteNews,
+  savedNews,
+}) => {
+  const {
+    author,
+    title,
+    url,
+    urlToImage,
+    publishedAt,
+    content,
+  } = news
+  return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
         <View style={styles.titleContainer}>
@@ -105,13 +126,15 @@ export const Card = ({
               {author}
             </Text>
             <Text style={styles.publishedText}>
-              {format(new Date(publishedAt), "dd-mm-yyyy")}
+              {publishedAt && format(new Date(publishedAt), "dd-MM-yyyy HH:MM")}
             </Text>
           </View>
         </View>
-        <View style={styles.imageContainer}>
-          <Image source={{ uri: urlToImage }} style={styles.image} />
-        </View>
+        {isValidUrl(urlToImage) && (
+          <View style={styles.imageContainer}>
+            <Image source={{ uri: urlToImage }} style={styles.image} />
+          </View>
+        )}
       </View>
       <View style={styles.contentContainer}>
         <Text style={styles.contentText}>
@@ -121,16 +144,58 @@ export const Card = ({
       <View style={styles.buttonsContainer}>
         <TouchableHighlight
           onPress={() => handleLearnMorePress(url)}
-          underlayColor="none"
+          underlayColor="transparent"
+          style={styles.openWebview}
         >
           <Text style={styles.newsButtonText}>
             {Dictionary.components.card.goToNews}
           </Text>
         </TouchableHighlight>
-        <View style={styles.favoriteButtonContainer}>
-          <Text style={styles.favoriteText}>{Dictionary.components.card.addToFav}</Text>
-          <CustomIcon name="star" size={20} />
-        </View>
+        <TouchableHighlight
+          onPress={() => handleCurrentNews({ currentNews: news, deleteNews })}
+          underlayColor="transparent"
+          style={styles.bookmark}
+        >
+          <View style={styles.favoriteButtonContainer}>
+            <Text style={styles.favoriteText}>
+              {
+                !deleteNews
+                  ? Dictionary.components.card.addToSaved
+                  : Dictionary.components.card.deleteNews
+              }
+            </Text>
+            <CustomIcon color={deleteNews ? Colors.error : Colors.tintColorSecond} name={deleteNews || isNewsSaved({ news, savedNews }) ? "bookmark" : "bookmark-outline"} size={20} />
+          </View>
+        </TouchableHighlight>
       </View>
     </View>
   )
+}
+
+Card.propTypes = {
+  news: PropTypes.shape({
+    author: PropTypes.string,
+    title: PropTypes.string,
+    url: PropTypes.string,
+    urlToImage: PropTypes.string,
+    publishedAt: PropTypes.string,
+    content: PropTypes.string,
+  }),
+  handleCurrentNews: PropTypes.func,
+  deleteNews: PropTypes.bool,
+  savedNews: PropTypes.array,
+}
+
+Card.defaultProps = {
+  news: {
+    author: '',
+    title: '',
+    url: '',
+    urlToImage: null,
+    publishedAt: '',
+    content: '',
+  },
+  handleCurrentNews: () => { },
+  deleteNews: false,
+  savedNews: [],
+}
