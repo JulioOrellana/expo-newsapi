@@ -1,0 +1,1 @@
+export const sanitizeHtml = text => text.replace(/<\/?[^>]+(>|$)/g, "")
